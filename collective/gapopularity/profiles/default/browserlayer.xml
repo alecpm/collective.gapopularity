@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<layers>
+    <layer name="collective.gapopularity"
+        interface="collective.gapopularity.interfaces.IPopularityLayer" />
+</layers>

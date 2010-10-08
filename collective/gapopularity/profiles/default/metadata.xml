@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<metadata>
+  <version>1.0a1</version>
+  <dependencies>
+      <dependency>profile-collective.googleanalytics:default</dependency>
+  </dependencies>
+</metadata>

@@ -1,0 +1,36 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    i18n_domain="collective.gapopularity">
+  
+  <adapter factory=".behavior.Popularity" />
+  <adapter name="ga_popularity" factory=".behavior.ga_popularity_indexer" />
+  
+  <browser:page
+      for="*"
+      name="update_popularity"
+      class=".sync.UpdatePopularity"
+      layer=".interfaces.IPopularityLayer"
+      permission="cmf.ManagePortal"
+      />
+  
+  <!-- Register the installation GenericSetup extension profile -->
+  <genericsetup:registerProfile
+      name="default"
+      title="Google Analytics Popularity"
+      directory="profiles/default"
+      description="Adds a popularity count to Plone objects."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+      
+  <genericsetup:importStep
+    name="collective.gapopularity"
+    title="collective.gapopularity"
+    description="Various setup tasks for collective.gapopularity."
+    handler=".setuphandlers.import_various">
+  </genericsetup:importStep>
+
+</configure>
