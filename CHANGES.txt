@@ -4,6 +4,9 @@ Changelog
 1.0a1 (unreleased)
 -------------------
 
+- Reindex objects manually for compatibility with Archetypes content.
+  [yomatters - 2010-12-02]
+
 - Added view action to URL for content types that use it.
   [yomatters - 2010-12-02]
 

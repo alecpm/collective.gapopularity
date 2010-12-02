@@ -1,7 +1,6 @@
 import traceback
 from zope.publisher.browser import BrowserPage
 from zope.component import getMultiAdapter, getUtility
-from zope.lifecycleevent import modified
 from zope.schema.interfaces import IVocabularyFactory
 from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
@@ -120,7 +119,7 @@ class UpdatePopularity(BrowserPage):
                 adapter = IPopularity(obj, None)
                 if adapter:
                     adapter.ga_popularity = popularity
-                    modified(obj)
+                    obj.reindexObject(['ga_popularity'])
                     updated += 1
                     
         return 'Successfully updated popularity for %i objects.' % updated
