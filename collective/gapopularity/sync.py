@@ -100,10 +100,17 @@ class UpdatePopularity(BrowserPage):
             'path': '/'.join(self.context.getPhysicalPath()),
         })
         
-        updated = 0
+        # Get a list of types that need an explicit view action in the URL.
+        portal_properties = getToolByName(self.context, 'portal_properties')
+        site_properties = portal_properties.get('site_properties')
+        use_view_action = site_properties.getProperty('typesUseViewActionInListings', [])
         
+        updated = 0
+                        
         for brain in brains:
             url = brain.getURL().replace(self.request.SERVER_URL, '').strip()
+            if brain.portal_type in use_view_action:
+                url += '/view'
             popularity = popularity_map.get(url, 0)
             popularity += popularity_map.get(url + '/', 0)
             
