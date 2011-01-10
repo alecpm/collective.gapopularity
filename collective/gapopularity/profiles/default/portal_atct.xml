@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<atcttool>
+ <topic_indexes>
+  <index name="ga_popularity"
+     description="The popularity count from Google Analytics"
+     enabled="True" friendlyName="Popularity">
+   <criteria>ATSimpleIntCriterion</criteria>
+  </index>
+ </topic_indexes>
+</atcttool>

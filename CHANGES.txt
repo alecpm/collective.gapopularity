@@ -4,6 +4,9 @@ Changelog
 1.0a1 (unreleased)
 -------------------
 
+- Added popularity index as a choice in collections.
+  [yomatters - 2011-01-10]
+
 - Register as a Dexterity behavior when plone.app.dexterity is present.
   [yomatters - 2011-01-10]
 
