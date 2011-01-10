@@ -1,5 +1,4 @@
 from Acquisition import aq_base
-from zope.component import adapts
 from zope.interface import implements
 from plone.indexer import indexer
 from collective.gapopularity.interfaces import IPopularity, \
@@ -7,7 +6,6 @@ from collective.gapopularity.interfaces import IPopularity, \
 
 class Popularity(object):
     implements(IPopularity)
-    adapts(IPopularityMarker)
     
     def __init__(self, context):
         self.context = context

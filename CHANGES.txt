@@ -4,6 +4,9 @@ Changelog
 1.0a1 (unreleased)
 -------------------
 
+- Register as a Dexterity behavior when plone.app.dexterity is present.
+  [yomatters - 2011-01-10]
+
 - Reindex objects manually for compatibility with Archetypes content.
   [yomatters - 2010-12-02]
 
