@@ -1,8 +1,9 @@
 import traceback
+from Acquisition import aq_parent, aq_inner
 from zope.publisher.browser import BrowserPage
 from zope.component import getMultiAdapter, getUtility
 from zope.schema.interfaces import IVocabularyFactory
-from Products.CMFCore.interfaces import ISiteRoot
+from Products.CMFCore.interfaces import ISiteRoot, IContentish
 from Products.CMFCore.utils import getToolByName
 from collective.googleanalytics.interfaces.report import IAnalyticsReportRenderer
 from collective.gapopularity import logger
@@ -92,35 +93,55 @@ class UpdatePopularity(BrowserPage):
         # Get the results of the query.
         popularity_map = dict(renderer.rows())
         
-        # Get brains for all the objects.
-        catalog = getToolByName(self.context, 'portal_catalog')
-        brains = catalog.searchResults({
-            'object_provides': IPopularityMarker.__identifier__,
-            'path': '/'.join(self.context.getPhysicalPath()),
-        })
-        
         # Get a list of types that need an explicit view action in the URL.
         portal_properties = getToolByName(self.context, 'portal_properties')
         site_properties = portal_properties.get('site_properties')
         use_view_action = site_properties.getProperty('typesUseViewActionInListings', [])
         
         updated = 0
-                        
-        for brain in brains:
-            url = brain.getURL().replace(self.request.SERVER_URL, '').strip()
-            if brain.portal_type in use_view_action:
-                url += '/view'
-            popularity = popularity_map.get(url, 0)
-            popularity += popularity_map.get(url + '/', 0)
-            
-            # Set the popularity if it has changed.
-            if popularity != brain.ga_popularity:
-                obj = brain.getObject()
+        
+        # Determine whether we are querying for all objects that provide the
+        # marker interface or attempting to traverse to the URLs returned
+        # by Google Analytics.
+        traverse = kwargs.get('traverse', self.request.get('traverse', None))
+        if traverse:
+            # Attempt to traverse to each URL.
+            for path, popularity in popularity_map.items():
+                obj = self.context.restrictedTraverse(path.lstrip('/'), None)
+                if not IContentish.providedBy(obj):
+                    obj = aq_parent(aq_inner(obj))
+                    if not IContentish.providedBy(obj):
+                        continue
                 adapter = IPopularity(obj, None)
                 if adapter:
-                    adapter.ga_popularity = popularity
-                    obj.reindexObject(['ga_popularity'])
-                    updated += 1
+                    if not adapter.ga_popularity == popularity:
+                        adapter.ga_popularity = popularity
+                        obj.reindexObject(['ga_popularity'])
+                        updated += 1
+                
+        else:        
+            # Get brains for all the objects.
+            catalog = getToolByName(self.context, 'portal_catalog')
+            brains = catalog.searchResults({
+                'object_provides': IPopularityMarker.__identifier__,
+                'path': '/'.join(self.context.getPhysicalPath()),
+            })
+                        
+            for brain in brains:
+                url = brain.getURL().replace(self.request.SERVER_URL, '').strip()
+                if brain.portal_type in use_view_action:
+                    url += '/view'
+                popularity = popularity_map.get(url, 0)
+                popularity += popularity_map.get(url + '/', 0)
+            
+                # Set the popularity if it has changed.
+                if popularity != brain.ga_popularity:
+                    obj = brain.getObject()
+                    adapter = IPopularity(obj, None)
+                    if adapter:
+                        adapter.ga_popularity = popularity
+                        obj.reindexObject(['ga_popularity'])
+                        updated += 1
                     
         return 'Successfully updated popularity for %i objects.' % updated
             
