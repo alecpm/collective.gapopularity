@@ -2,11 +2,13 @@ import traceback
 from Acquisition import aq_parent, aq_inner
 from zope.publisher.browser import BrowserPage
 from zope.component import getMultiAdapter, getUtility
+from zope.event import notify
 from zope.schema.interfaces import IVocabularyFactory
 from Products.CMFCore.interfaces import ISiteRoot, IContentish
 from Products.CMFCore.utils import getToolByName
 from collective.googleanalytics.interfaces.report import IAnalyticsReportRenderer
 from collective.gapopularity import logger
+from collective.gapopularity.events import PopularityUpdatedEvent
 from collective.gapopularity.interfaces import IPopularityMarker, \
     IPopularity
 from datetime import date, timedelta
@@ -98,7 +100,7 @@ class UpdatePopularity(BrowserPage):
         site_properties = portal_properties.get('site_properties')
         use_view_action = site_properties.getProperty('typesUseViewActionInListings', [])
         
-        updated = 0
+        updated = []
         
         # Determine whether we are querying for all objects that provide the
         # marker interface or attempting to traverse to the URLs returned
@@ -117,7 +119,7 @@ class UpdatePopularity(BrowserPage):
                     if not adapter.ga_popularity == popularity:
                         adapter.ga_popularity = popularity
                         obj.reindexObject(['ga_popularity'])
-                        updated += 1
+                        updated.append(obj.UID())
                 
         else:        
             # Get brains for all the objects.
@@ -141,7 +143,10 @@ class UpdatePopularity(BrowserPage):
                     if adapter:
                         adapter.ga_popularity = popularity
                         obj.reindexObject(['ga_popularity'])
-                        updated += 1
-                    
-        return 'Successfully updated popularity for %i objects.' % updated
+                        updated.append(obj.UID())
+                        
+        if updated:
+            notify(PopularityUpdatedEvent(updated))
+        
+        return 'Successfully updated popularity for %i objects.' % len(updated)
             
