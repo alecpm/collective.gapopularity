@@ -4,6 +4,9 @@ Changelog
 1.0a1 (unreleased)
 -------------------
 
+- Don't reindex the newly added popularity index.
+  [yomatters - 2012-04-27]
+
 - Added the option to traverse to objects instead of querying for them.
   [yomatters - 2011-08-26]
 

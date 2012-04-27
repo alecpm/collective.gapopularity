@@ -23,9 +23,6 @@ def addCatalogIndexes(context):
             catalog.addIndex(name, meta_type)
             added.append(name)
             logger.info("Added %s for field %s.", meta_type, name)
-    if added:
-        logger.info("Indexing new indexes %s.", ', '.join(added))
-        catalog.manage_reindexIndex(ids=added)
         
 def import_various(context):
     """
