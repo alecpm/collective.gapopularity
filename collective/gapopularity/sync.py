@@ -143,7 +143,7 @@ class UpdatePopularity(BrowserPage):
                     if adapter:
                         adapter.ga_popularity = popularity
                         obj.reindexObject(['ga_popularity'])
-                        updated.append(obj.UID())
+                        updated.append(brain.UID)
                         
         if updated:
             notify(PopularityUpdatedEvent(updated))
