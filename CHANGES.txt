@@ -4,6 +4,9 @@ Changelog
 1.0a1 (unreleased)
 -------------------
 
+- Added an optional sync argument for a prefix that is removed from the URL.
+  [yomatters - 2012-05-15]
+
 - Added an event for post-processing objects for which the popularity count has
   been updated.
   [yomatters - 2012-04-27]

@@ -102,6 +102,10 @@ class UpdatePopularity(BrowserPage):
         
         updated = []
         
+        # See if we need to strip a prefix from the URL. This is useful
+        # for running the sync from a cron job.
+        prefix = kwargs.get('prefix', self.request.get('prefix', None))
+        
         # Determine whether we are querying for all objects that provide the
         # marker interface or attempting to traverse to the URLs returned
         # by Google Analytics.
@@ -109,6 +113,8 @@ class UpdatePopularity(BrowserPage):
         if traverse:
             # Attempt to traverse to each URL.
             for path, popularity in popularity_map.items():
+                if prefix and path.startswith(prefix):
+                    path = path[len(prefix):]
                 obj = self.context.restrictedTraverse(path.lstrip('/'), None)
                 if not IContentish.providedBy(obj):
                     obj = aq_parent(aq_inner(obj))
@@ -128,9 +134,11 @@ class UpdatePopularity(BrowserPage):
                 'object_provides': IPopularityMarker.__identifier__,
                 'path': '/'.join(self.context.getPhysicalPath()),
             })
-                        
+                                    
             for brain in brains:
                 url = brain.getURL().replace(self.request.SERVER_URL, '').strip()
+                if prefix and url.startswith(prefix):
+                    url = url[len(prefix):]
                 if brain.portal_type in use_view_action:
                     url += '/view'
                 popularity = popularity_map.get(url, 0)
