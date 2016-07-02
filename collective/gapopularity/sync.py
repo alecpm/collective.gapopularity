@@ -3,6 +3,7 @@ from Acquisition import aq_parent, aq_inner
 from zope.publisher.browser import BrowserPage
 from zope.component import getMultiAdapter, getUtility
 from zope.event import notify
+from zope.interface import alsoProvides
 from zope.schema.interfaces import IVocabularyFactory
 from Products.CMFCore.interfaces import ISiteRoot, IContentish
 from Products.CMFCore.utils import getToolByName
@@ -12,6 +13,11 @@ from collective.gapopularity.events import PopularityUpdatedEvent
 from collective.gapopularity.interfaces import IPopularityMarker, \
     IPopularity
 from datetime import date, timedelta
+try:
+    from plone.protect.interfaces import IDisableCSRFProtection
+except ImportError:
+    from zope.interface import Interface as IDisableCSRFProtection
+
 
 class UpdatePopularity(BrowserPage):
     """
@@ -19,7 +25,7 @@ class UpdatePopularity(BrowserPage):
     """
     
     def __call__(self, **kwargs):
-        
+        alsoProvides(self.request, IDisableCSRFProtection)
         try:
             return self.sync_popularity(**kwargs)
         except:
